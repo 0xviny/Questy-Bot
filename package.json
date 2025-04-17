@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "bun build",
-    "dev": "nodemon --watch packages --ext ts,json --exec node --loader ts-node/esm tsconfig-paths-bootstrap.ts",
+    "dev": "nodemon --watch 'packages/**/*.ts' --exec 'bun run index.ts' --ext ts",
     "start": "bun run index.ts"
   },
   "devDependencies": {
@@ -16,14 +16,12 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "chokidar": "^4.0.3",
     "colors": "^1.4.0",
     "discord.js": "^14.18.0",
     "dotenv": "^16.5.0",
     "mongoose": "^8.13.2",
     "nodemon": "^3.1.9",
     "reflect-metadata": "^0.2.2",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0"
+    "ts-node": "^10.9.2"
   }
 }

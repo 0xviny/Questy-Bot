@@ -1,8 +1,12 @@
 import {
   Client,
   ButtonInteraction,
-  SelectMenuInteraction,
   ModalSubmitInteraction,
+  UserSelectMenuInteraction,
+  RoleSelectMenuInteraction,
+  ChannelSelectMenuInteraction,
+  StringSelectMenuInteraction,
+  MentionableSelectMenuInteraction,
 } from "discord.js";
 import { readdirSync } from "fs";
 import { join } from "path";
@@ -12,7 +16,14 @@ import { MODAL_METADATA_KEY } from "../decorators/Modal";
 
 export interface IComponentInteraction {
   execute(
-    interaction: ButtonInteraction | SelectMenuInteraction | ModalSubmitInteraction
+    interaction:
+      | ButtonInteraction
+      | StringSelectMenuInteraction
+      | UserSelectMenuInteraction
+      | RoleSelectMenuInteraction
+      | ChannelSelectMenuInteraction
+      | MentionableSelectMenuInteraction
+      | ModalSubmitInteraction
   ): Promise<void>;
 }
 
@@ -44,7 +55,14 @@ export class InteractionHandler {
   }
 
   public async handleInteraction(
-    interaction: ButtonInteraction | SelectMenuInteraction | ModalSubmitInteraction
+    interaction:
+      | ButtonInteraction
+      | StringSelectMenuInteraction
+      | UserSelectMenuInteraction
+      | RoleSelectMenuInteraction
+      | ChannelSelectMenuInteraction
+      | MentionableSelectMenuInteraction
+      | ModalSubmitInteraction
   ): Promise<void> {
     const handler = this.interactions.get(interaction.customId);
     if (handler) await handler.execute(interaction);

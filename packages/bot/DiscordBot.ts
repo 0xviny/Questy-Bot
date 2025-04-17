@@ -4,7 +4,6 @@ import { Logger } from "@core/utils/Logger";
 import { CommandHandler } from "@core/handlers/CommandHandler";
 import { EventHandler } from "@core/handlers/EventHandler";
 import { InteractionHandler } from "@core/handlers/InteractionHandler";
-import chokidar from "chokidar";
 
 export class DiscordBot {
   public client: Client;
@@ -29,18 +28,6 @@ export class DiscordBot {
     const interactionsPath = __dirname + "/interactions";
 
     await this.commandHandler.loadCommands(commandsPath).catch((error) => Logger.error(error));
-
-    /* const watcher = chokidar.watch(commandsPath, {
-      persistent: true,
-      ignoreInitial: true,
-    });
-
-    watcher.on("change", async (path) => {
-      Logger.info(`Comando alterado: ${path}`);
-      await this.commandHandler.reloadCommands(commandsPath).catch((error) => Logger.error(error));
-      Logger.success("Comandos recarregados com sucesso!");
-    }); */
-
     await this.eventHandler.loadEvents(eventsPath).catch((error) => Logger.error(error));
     await this.interactionHandler
       .loadInteractions(interactionsPath)

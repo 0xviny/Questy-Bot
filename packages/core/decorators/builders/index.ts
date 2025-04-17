@@ -5,4 +5,5 @@ export * from "./MentionableSelectMenuBuilder";
 export * from "./RoleSelectMenuBuilder";
 export * from "./StringSelectMenuBuilder";
 export * from "./UserSelectMenuBuilder";
+export * from "./ChannelSelectMenuBuilder";
 export * from "./TextInputBuilder";

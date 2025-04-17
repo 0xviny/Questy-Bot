@@ -94,7 +94,7 @@ Esta organização torna o projeto altamente modular, testável, escalável e de
 ## Scripts do Projeto
 
 - **Build:** `bun run build`  
-- **Desenvolvimento:** `bun run dev`  
+- **Desenvolvimento:** `bun run dev` // utilizando nodemon para detectar alterações em arquivos .ts e reiniciar o bot automaticamente
 - **Start:** `bun run start`
 
 ## Como Usar o Core
