@@ -1,69 +1,82 @@
-# Questy Bot - Structured Bot for Discord
+# Questy Structure
 
-Este projeto é uma aplicação profissional de bot para Discord, construída com TypeScript e [discord.js](https://discord.js.org/). A arquitetura está dividida em duas packages principais:
+Uma **estrutura de bot para Discord** escrita em TypeScript, baseada em `discord.js`, com arquitetura dividida em duas packages:
 
-- **core**: Contém toda a infraestrutura do back-end, com decorators, handlers, conexão com MongoDB, utilitários e abstrações de Builders do discord.js (ex.: Embed, Button, SelectMenu, Modal, TextInput, etc).
-- **bot**: Responsável pela integração com o Discord (comandos, eventos, interações) e utiliza a package core para registrar e executar as funcionalidades.
+- **core**: infraestrutura e abstrações (decorators, handlers, conexão com MongoDB, utilitários, builders personalizados).  
+- **bot**: definição de comandos, eventos e interações, consumindo tudo do `core`.
 
-Esta organização torna o projeto altamente modular, testável, escalável e de fácil manutenção. Além disso, a utilização de abstrações de builders e wrappers funcionais contribui para um código mais limpo, em linha com práticas modernas como Object Calisthenics.
+Essa separação torna o código **limpo**, **testável**, **reutilizável** e **fácil de escalar**.
 
-## Por Que Essa Arquitetura?
+---
 
-- **Organização Modular:**  
-  Separa o código de infraestrutura (core) da lógica de aplicação (bot). Dessa forma, as funcionalidades transversais (como logging, conexão com o banco ou criação de componentes) ficam centralizadas e podem ser reutilizadas em diversas partes do projeto.
-  
-- **Facilidade de Manutenção e Escalabilidade:**  
-  - **Core**: Centraliza os decorators, handlers e conexões com serviços (ex.: MongoDB).  
-  - **Bot**: Cuida exclusivamente da integração com a API do Discord, permitindo o desenvolvimento de comandos, eventos e interações de maneira organizada.
-  
-- **Abstrações com Builders:**  
-  Decorators para os Builders (por exemplo, `@EmbedConstructor`, `@ButtonConstructor`, `@SelectMenuConstructor`, `@ModalConstructor` e `@TextInputConstructor`) permitem a criação de componentes de UI do Discord de forma declarativa, centralizada e reutilizável.
-  
-- **Performance e Eficiência:**  
-  - A separação de responsabilidades melhora a legibilidade e facilita o desenvolvimento de testes unitários.  
-  - A injeção de comportamentos (por exemplo, wrappers funcionais para operações de usuário) garante que operações comuns (como logging ou tratamento de erros) sejam realizadas de forma consistente e com overhead mínimo.
-  
-- **Suporte a Object Calisthenics:**  
-  O projeto adota padrões para um código mais modular e orientado a objetos, limitando complexidade e incentivando uma estrutura limpa (ex.: funções puras, poucas declarações por linha, sem utilização excessiva de condicionais, etc).
+## 📋 Sumário
 
-## Estrutura de Diretórios
+1. [Principais Recursos](#-principais-recursos)  
+2. [Arquitetura](#-arquitetura)  
+3. [Estrutura de Diretórios](#-estrutura-de-diretórios)  
+4. [Instalação](#-instalação)  
+5. [Configuração](#-configuração)  
+6. [Uso](#-uso)  
+   - [Comando Ping (v1)](#comando-ping-v1)  
+   - [Comando Test (V2 Components)](#comando-test-v2-components)  
+   - [Evento Ready](#evento-ready)  
+   - [Handler de Botão](#handler-de-botão)  
+7. [Como Contribuir](#-como-contribuir)  
+8. [Licença](#-licença)
 
-```txt
+---
+
+## ✨ Principais Recursos
+
+- **Decorators** para comandos, eventos e components (v1 e V2)  
+- **Builders customizados** (Embed, Button, SelectMenu, Modal, TextInput, V2 Components)  
+- **Handlers automáticos**: scan de diretórios e registro de comandos/eventos/interações  
+- **MongoDB** integrado via Mongoose  
+- Organização **core** / **bot** para máxima reutilização  
+- Suporte a **Object Calisthenics** e clean code  
+
+---
+
+## 🏗️ Arquitetura
+
+1. **core**  
+   - `decorators/`: marcações para comandos (`@Command`), eventos (`@Event`), components (`@EmbedConstructor`, `@ButtonConstructor`, `@TextInputConstructor`, V2 etc.)  
+   - `handlers/`: scan e registro automático de comandos, eventos e interações  
+   - `database/`: conexão e models Mongoose  
+   - `utils/`: Logger, wrappers de operações comuns  
+
+2. **bot**  
+   - `commands/`: classes de comando que usam os decorators do core  
+   - `events/`: classes de evento (ready, messageCreate etc.)  
+   - `interactions/`: handlers de interações (botões, selects, modais)  
+
+---
+
+## 📂 Estrutura de Diretórios
+
+```text
 /my-discord-bot
-├─ package.json
-├─ tsconfig.json
-├─ .env
 ├─ packages
 │  ├─ core
 │  │  ├─ decorators
 │  │  │  ├─ builders
-│  │  │  │  ├─ BuilderConstructor.ts
 │  │  │  │  ├─ EmbedBuilder.ts
 │  │  │  │  ├─ ButtonBuilder.ts
-│  │  │  │  ├─ StringSelectMenuBuilder.ts
-│  │  │  │  ├─ UserSelectMenuBuilder.ts
-│  │  │  │  ├─ RoleSelectMenuBuilder.ts
-│  │  │  │  ├─ MentionableSelectMenuBuilder.ts
-│  │  │  │  ├─ ModalBuilder.ts
-│  │  │  │  └─ TextInputBuilder.ts
-│  │  │  └─ index.ts              # Agrupa os builders
-│  │  |  ├─ Button.ts
-│  │  |  ├─ Embed.ts
-│  │  |  ├─ Modal.ts
-│  │  |  ├─ SelectMenu.ts
-│  │  |  ├─ Command.ts
-│  │  |  ├─ Event.ts
-│  │  ├─ database
-│  │  │  ├─ models
-│  │  │  │  └─ User.ts
-│  │  │  ├─ Database.ts
-│  │  │  ├─ UserController.ts     # Ex.: userController.create(discordId, username)
-│  │  │  ├─ UserService.ts
-│  │  │  └─ userOperationWrapper.ts
+│  │  │  │  ├─ TextInputBuilder.ts
+│  │  │  │  └─ v2/
+│  │  │  │     ├─ BuilderConstructorV2.ts
+│  │  │  │     ├─ TextDisplayBuilder.ts
+│  │  │  │     └─ …  
+│  │  │  ├─ Command.ts
+│  │  │  ├─ Event.ts
+│  │  │  └─ index.ts
 │  │  ├─ handlers
 │  │  │  ├─ CommandHandler.ts
 │  │  │  ├─ EventHandler.ts
 │  │  │  └─ InteractionHandler.ts
+│  │  ├─ database
+│  │  │  ├─ Database.ts
+│  │  │  └─ models/User.ts
 │  │  └─ utils
 │  │     └─ Logger.ts
 │  └─ bot
@@ -74,81 +87,56 @@ Esta organização torna o projeto altamente modular, testável, escalável e de
 │     ├─ events
 │     │  └─ ReadyEvent.ts
 │     └─ interactions
-│        └─ ExampleButton.ts
-└─ index.ts                        # Bootstrap: conecta ao MongoDB e inicia o bot
+│        └─ ButtonInteractionHandler.ts
+├─ package.json
+├─ tsconfig.json
+├─ .env
+└─ index.ts           # Bootstrap principal
 ```
 
-## Configuração do Ambiente
+---
 
-1. Crie um arquivo `.env` na raiz do projeto e defina:
-   ```env
-   DISCORD_TOKEN=seu_token_do_discord
-   MONGO_URI=seu_uri_mongodb
+## ⚙️ Instalação
+
+1. Clone o repositório:  
+   ```bash
+   git clone https://github.com/seu-usuario/questy-bot.git
+   cd questy-bot
    ```
-
-2. Instale as dependências:
+2. Instale dependências (Bun/Yarn/NPM):  
    ```bash
    bun install
+   # ou
+   yarn
+   # ou
+   npm install
    ```
 
-## Scripts do Projeto
+---
 
-- **Build:** `bun run build`  
-- **Desenvolvimento:** `bun run dev` // utilizando nodemon para detectar alterações em arquivos .ts e reiniciar o bot automaticamente
-- **Start:** `bun run start`
+## 🔧 Configuração
 
-## Como Usar o Core
+Crie um arquivo `.env` na raiz, com:
 
-A package **core** contém:
+```env
+DISCORD_TOKEN=seu_token_do_discord
+MONGO_URI=seu_uri_do_mongodb
+```
 
-- **Decorators de Builders:**  
-  Permitem criar componentes do discord.js de forma declarativa:
-  ```ts
-  import { EmbedConstructor, ButtonConstructor, ModalConstructor, TextInputConstructor } from "@core/decorators/builders";
+---
 
-  class MyUI {
-    @EmbedConstructor({ title: "Bem-vindo", description: "Mensagem de boas-vindas", color: 0x00ff00 })
-    static welcomeEmbed!: EmbedBuilder;
+## 🚀 Uso
 
-    @ButtonConstructor({ label: "Clique aqui", custom_id: "btn_click", style: 1 })
-    static welcomeButton!: ButtonBuilder;
+### Comando Ping (comando normal)
 
-    @ModalConstructor({ custom_id: "modal_test", title: "Teste Modal" })
-    static testModal!: ModalBuilder;
-
-    @TextInputConstructor({
-      custom_id: "input_nome",
-      label: "Seu nome",
-      placeholder: "Digite seu nome",
-      style: 1
-    })
-    static nomeInput!: TextInputBuilder;
-  }
-  ```
-- **Handlers:**  
-  - **CommandHandler.ts:** Faz o scan e registro automático de comandos com `@Command`.
-  - **EventHandler.ts:** Registra eventos do Discord com `@Event`.
-  - **InteractionHandler.ts:** Registra interações (botões, select menus, modals) usando os builders.
-
-- **Database:**  
-  - **Database.ts:** Conecta ao MongoDB usando [Mongoose](https://mongoosejs.com/).
-  - **UserDecorators.ts ou HOFs:** Para operações comuns no usuário. Se os decorators de método causarem problemas, utilize higher order functions, como ilustrado no arquivo `userOperationWrapper.ts`.
-
-- **Utilitários:**  
-  - **Logger.ts:** Para um logging padronizado e centralizado.
-
-## Como Usar o Bot
-
-A package **bot** utiliza o core e contém:
-- **DiscordBot.ts:** Classe principal que instancia o client do Discord, registra os handlers e inicializa o bot.
-- **commands/**, **events/** e **interactions/**: Conjuntos de recursos que serão automaticamente carregados pelo sistema de handlers.
-
-Exemplo de um comando simples:
 ```ts
 // packages/bot/commands/PingCommand.ts
-import { ChatInputCommandInteraction } from "discord.js";
+import { ButtonBuilder, ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { Command } from "@core/decorators/Command";
-import { ICommand } from "@core/handlers/CommandHandler";
+import type { ICommand } from "@core/handlers/CommandHandler";
+import { EmbedConstructor } from "@core/decorators/builders/EmbedBuilder";
+import { ButtonConstructor } from "@core/decorators/builders/ButtonBuilder";
+import { buildComponentRows } from "@core/handlers/ComponentHandler";
 
 @Command({
   name: "ping",
@@ -156,60 +144,120 @@ import { ICommand } from "@core/handlers/CommandHandler";
   aliases: ["p"]
 })
 export default class PingCommand implements ICommand {
-  public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-    await interaction.reply("Pong!");
+  @EmbedConstructor({
+    title: "🏓 Pong!",
+    description: "Resposta via embed",
+    color: 0x00ff00
+  })
+  embed!: EmbedBuilder;
+
+  @ButtonConstructor({
+    label: "Clique aqui!",
+    custom_id: "btn_click",
+    style: 1
+  })
+  button!: ButtonBuilder;
+
+  public async execute(interaction: ChatInputCommandInteraction) {
+    await interaction.reply({
+      embeds: [this.embed],
+      components: buildComponentRows(this.button)
+    });
   }
 }
 ```
 
-## Bootstrap da Aplicação
+### Comando Test (com V2 Components)
 
-No arquivo `index.ts` na raiz, conectamos ao MongoDB e inicializamos o bot:
 ```ts
-import "reflect-metadata";
-import { config } from "dotenv";
-import { DiscordBot } from "@bot/DiscordBot";
-import { Database } from "@core/database/Database";
-import { Logger } from "@core/utils/Logger";
+// packages/bot/commands/TestCommand.ts
+import { Command } from "@core/decorators/Command";
+import type { ICommand } from "@core/handlers/CommandHandler";
+import {
+  V2Message,
+  TextDisplay,
+  Separator,
+  Button,
+  StringSelect,
+  UserSelect,
+  RoleSelect,
+  MentionableSelect,
+  ChannelSelect
+} from "@core/decorators/builders/v2";
+import type { ChatInputCommandInteraction } from "discord.js";
+import { responseV2 } from "@core/responses/v2";
 
-config();
-
-(async () => {
-  const mongoUri = process.env.MONGO_URI;
-  if (!mongoUri) {
-    Logger.error("MONGO_URI não definido no .env");
-    process.exit(1);
+@V2Message()
+@Command({ name: "test", description: "Teste V2 com vários componentes" })
+export default class TestCommand implements ICommand {
+  @TextDisplay({ content: "🚀 Hello V2!" })
+  @Separator()
+  @Button({ customId: "btn_ok", label: "👍 OK", style: 1 })
+  @StringSelect({
+    customId: "sel_str",
+    options: [
+      { label: "One", value: "1" },
+      { label: "Two", value: "2" }
+    ]
+  })
+  @UserSelect({ customId: "sel_user" })
+  @RoleSelect({ customId: "sel_role" })
+  @MentionableSelect({ customId: "sel_mention" })
+  @ChannelSelect({ customId: "sel_channel" })
+  public async execute(interaction: ChatInputCommandInteraction) {
+    await responseV2(this.constructor, interaction, "Aqui está o layout V2 completo!");
   }
-
-  const database = new Database(mongoUri);
-  await database.connect();
-
-  const bot = new DiscordBot();
-  await bot.init();
-  bot.start();
-})();
+}
 ```
 
-## Benefícios da Abordagem
+### Evento Ready
 
-- **Desempenho Otimizado:**  
-  A separação entre *core* e *bot* permite isolar funcionalidades, facilitando otimizações e o uso de operações assíncronas (como conexão com o MongoDB e processamento de interações) sem afetar todo o sistema.
-  
-- **Fácil Manutenção e Escalabilidade:**  
-  Cada módulo possui responsabilidade única, facilitando a localização de bugs, adição de novos recursos ou a refatoração de partes específicas sem impacto global.
+```ts
+// packages/bot/events/ReadyEvent.ts
+import { Client } from "discord.js";
+import { Event } from "@core/decorators/Event";
+import type { IEvent } from "@core/handlers/EventHandler";
+import { Logger } from "@core/utils/Logger";
 
-- **Código Limpo e Testável:**  
-  A utilização de decorators, higher order functions e a separação modular alinham o projeto às práticas de Object Calisthenics, incentivando código mais simples, legível e isolado para testes unitários.
+@Event({ eventName: "ready", once: true })
+export default class ReadyEvent implements IEvent {
+  public async execute(client: Client): Promise<void> {
+    Logger.info(`Bot online como ${client.user?.tag}`);
+  }
+}
+```
 
-- **Flexibilidade para o Futuro:**  
-  Ao abstrair componentes comuns (como Builders do discord.js) em uma camada reutilizável, novas features ou mudanças na API do discord.js podem ser gerenciadas centralmente, sem a necessidade de alterações em cada comando ou evento.
+### Handler de Botão
 
-## Conclusão
+```ts
+// packages/bot/interactions/ButtonInteractionHandler.ts
+import { ButtonInteraction, MessageFlags } from "discord.js";
+import { Button } from "@core/decorators/builders/ButtonBuilder";
+import type { IComponentInteraction } from "@core/handlers/InteractionHandler";
 
-Esta arquitetura modular permite o desenvolvimento de um bot robusto para o Discord, com alto desempenho e manutenibilidade. Aproveite o poder dos decorators, higher order functions e uma separação de responsabilidades bem definida para construir soluções escaláveis e profissionais.
+@Button({ customId: "btn_click" })
+export default class ButtonInteractionHandler implements IComponentInteraction {
+  public async execute(interaction: ButtonInteraction): Promise<void> {
+    await interaction.reply({
+      content: "Você clicou no botão! 🎉",
+      flags: MessageFlags.Ephemeral
+    });
+  }
+}
+```
 
 ---
 
-Sinta-se à vontade para adaptar ou expandir este template conforme suas necessidades e evoluir o projeto com novas features e integrações.
+## 🤝 Como Contribuir
 
-Happy coding!
+1. Fork este repositório  
+2. Crie uma branch `feature/nome-da-feature`  
+3. Implemente sua feature e escreva testes  
+4. Abra um Pull Request  
+5. Siga as guidelines de estilo e mantenha o core separado conforme a arquitetura  
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença **MIT**. Veja o arquivo [LICENSE](./LICENSE) para mais detalhes.  
